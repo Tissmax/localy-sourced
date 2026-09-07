@@ -1,0 +1,41 @@
+{
+  "name": "@repo/schema",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "dev": "pnpm build --watch",
+    "build": "tsc -b -v"
+  },
+  "main": "./dist/entry.js",
+  "types": "./dist/entry.d.ts",
+  "files": [
+    "./dist/**"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/entry.js",
+      "require": "./dist/entry.js"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "require": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "@nestjs/mapped-types": "*",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.10.7",
+    "ts-loader": "^9.4.3",
+    "ts-node": "^10.9.2",
+    "typescript": "5.5.4"
+  }
+}
