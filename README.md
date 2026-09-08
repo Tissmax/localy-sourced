@@ -61,6 +61,28 @@ pnpm run build
 pnpm run dev
 ```
 
+### Docker development
+
+The complete Turborepo workspace can be started with Docker:
+
+```bash
+docker compose up --build
+```
+
+This starts all workspace applications through the root Turborepo command.
+The source tree is mounted into the container, while dependencies are kept in
+Docker volumes. Changes in `apps` and `packages` are therefore picked up by
+NestJS and Next.js without restarting the container.
+
+- API: `http://localhost:3000`
+- Web: `http://localhost:3001`
+
+Stop the environment with:
+
+```bash
+docker compose down
+```
+
 #### test
 
 ```bash
