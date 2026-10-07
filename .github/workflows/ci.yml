@@ -6,25 +6,39 @@ on:
     types: [opened, synchronize]
 jobs:
   build:
-    name: Build and Test
+    name: Build
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
+      
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 2
-      - uses: pnpm/action-setup@v3
+
+      - name: Setup pnpm  
+        uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aecedc3ccdd6d
         with:
           version: 8
+      
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65
         with:
           node-version: 20
           cache: 'pnpm'
+      
       - name: Install dependencies
         run: pnpm install
+      
+      - name: Lint
+        run: pnpm lint
+
       - name: Build
         run: pnpm build
+        
       - name: Test
         run: pnpm test
+
+      - name: Test(e2e)
+        run: pnpm test:e2e
+        

@@ -10,8 +10,14 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**"]
     },
-    "lint": {},
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
     "test": {},
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
     "test:e2e": {}
   }
 }

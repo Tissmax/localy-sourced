@@ -6,7 +6,7 @@ services:
       dockerfile: ./apps/web/Dockerfile
     restart: always
     ports:
-      - 3000:3000
+      - 3001:3001
     volumes:
       - ./:/app
       - pnpm_store:/pnpm/store
@@ -26,7 +26,7 @@ services:
       dockerfile: ./apps/api/Dockerfile
     restart: always
     ports:
-      - 3001:3001
+      - 3000:3000
     volumes:
       - ./:/app
       - pnpm_store:/pnpm/store
