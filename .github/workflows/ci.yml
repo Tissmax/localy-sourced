@@ -41,4 +41,7 @@ jobs:
 
       - name: Test(e2e)
         run: pnpm test:e2e
+
+      - name: Format code
+        run: pnpm format
         
