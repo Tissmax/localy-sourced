@@ -29,7 +29,9 @@ jobs:
       - name: Install dependencies
         run: |
           pnpm --version
-          pnpm install --frozen-lockfile
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm exec napi-postinstall unrs-resolver 1.11.1 check
+          pnpm rebuild @parcel/watcher
       
       - name: Lint
         run: pnpm lint
