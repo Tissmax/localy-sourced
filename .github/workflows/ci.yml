@@ -1,7 +1,5 @@
 name: CI
 on:
-  push:
-    branches: ["main"]
   pull_request:
     types: [opened, synchronize]
 jobs:
@@ -36,6 +34,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+
       - name: Build
         run: pnpm build
         
@@ -47,4 +48,5 @@ jobs:
 
       - name: Format code
         run: pnpm format
+      
         
