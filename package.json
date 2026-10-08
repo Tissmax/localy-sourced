@@ -16,10 +16,11 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "napi-postinstall": "0.3.4",
     "prettier": "^3.2.5",
     "turbo": "^2.10.12"
   },
-  "packageManager": "pnpm@8.15.5",
+  "packageManager": "pnpm@9.15.9",
   "engines": {
     "node": ">=18"
   }

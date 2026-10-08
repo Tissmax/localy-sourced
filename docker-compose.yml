@@ -3,44 +3,85 @@ services:
     container_name: web
     build:
       context: .
-      dockerfile: ./apps/web/Dockerfile
-    restart: always
-    ports:
-      - 3001:3001
-    volumes:
-      - ./:/app
-      - pnpm_store:/pnpm/store
-      - web_dist:/app/apps/web/dist
-      - /app/node_modules
-      - /app/apps/web/node_modules
-      - /app/packages/schema/node_modules
-      - /app/packages/typescript-config/node_modules
-      - /app/packages/tailwind-config/node_modules
-      - /app/packages/jest-config/node_modules
-      - /app/packages/eslint-config/node_modules
-      - /app/packages/ui/node_modules
-  api:
-    container_name: api
-    build:
-      context: .
-      dockerfile: ./apps/api/Dockerfile
+      dockerfile: apps/Dockerfile.next
     restart: always
     ports:
       - 3000:3000
-    volumes:
-      - ./:/app
-      - pnpm_store:/pnpm/store
-      - api_dist:/app/apps/api/dist
-      - /app/node_modules
-      - /app/apps/api/node_modules
-      - /app/packages/schema/node_modules
-      - /app/packages/typescript-config/node_modules
-      - /app/packages/tailwind-config/node_modules
-      - /app/packages/jest-config/node_modules
-      - /app/packages/eslint-config/node_modules
-      - /app/packages/ui/node_modules
+    develop:
+      watch:
+        - path: .
+          target: /src
+          action: sync
+        - path: .
+          target: package.json
+          action: rebuild
+          
+  api:
+    depends_on:
+      - nats
+    container_name: api
+    build:
+      context: .
+      dockerfile: apps/Dockerfile.nest
+      args:
+        SERVICE_URI: api
+        SERVICE_NAME: api
+    restart: always
+    ports:
+      - 3001:3001
+    develop:
+      watch:
+        - path: .
+          target: /src
+          action: sync
+        - path: .
+          target: package.json
+          action: rebuild
+      
+  redis-service:
+    depends_on:
+      - nats
+    container_name: redis-service
+    build:
+      context: .
+      dockerfile: apps/Dockerfile.nest
+      args:
+        SERVICE_NAME: redis-service
+        SERVICE_URI: services/redis-service
+    restart: always 
+    develop:
+      watch:
+      - path: /redis-service
+        target: /src
+        action: sync
+      - path: /redis-service
+        target: package.json
+        action: rebuild
+  
+  data-service:
+    depends_on:
+      - nats
+    container_name: data-service
+    build:
+      context: .
+      dockerfile: apps/Dockerfile.nest
+      args:
+        SERVICE_URI: services/data-service
+        SERVICE_NAME: data-service
+    restart: always
+    develop:
+      watch:
+      - path: /data-service
+        target: /src
+        action: sync
+      - path: /data-service
+        target: package.json
+        action: rebuild
 
-volumes:
-  pnpm_store:
-  api_dist:
-  web_dist:
+  nats:
+    container_name: nats
+    image: nats:latest
+    restart: always
+    ports:
+      - 4222:4222
+      - 8222:8222
