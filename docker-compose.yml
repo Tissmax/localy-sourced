@@ -17,8 +17,6 @@ services:
           action: rebuild
           
   api:
-    depends_on:
-      - nats
     container_name: api
     build:
       context: .
@@ -37,51 +35,3 @@ services:
         - path: .
           target: package.json
           action: rebuild
-      
-  redis-service:
-    depends_on:
-      - nats
-    container_name: redis-service
-    build:
-      context: .
-      dockerfile: apps/Dockerfile.nest
-      args:
-        SERVICE_NAME: redis-service
-        SERVICE_URI: services/redis-service
-    restart: always 
-    develop:
-      watch:
-      - path: /redis-service
-        target: /src
-        action: sync
-      - path: /redis-service
-        target: package.json
-        action: rebuild
-  
-  data-service:
-    depends_on:
-      - nats
-    container_name: data-service
-    build:
-      context: .
-      dockerfile: apps/Dockerfile.nest
-      args:
-        SERVICE_URI: services/data-service
-        SERVICE_NAME: data-service
-    restart: always
-    develop:
-      watch:
-      - path: /data-service
-        target: /src
-        action: sync
-      - path: /data-service
-        target: package.json
-        action: rebuild
-
-  nats:
-    container_name: nats
-    image: nats:latest
-    restart: always
-    ports:
-      - 4222:4222
-      - 8222:8222

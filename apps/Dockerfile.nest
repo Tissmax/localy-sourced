@@ -47,4 +47,4 @@ RUN adduser -S -D -u 1001 -G nestjs ${SERVICE_NAME}
 USER ${SERVICE_NAME}
 COPY --from=builder /app .
 
-CMD node apps/${SERVICE_URI}/dist/main.js
+CMD ["node", "apps/${SERVICE_URI}/dist/main.js"]
