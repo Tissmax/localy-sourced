@@ -1,8 +1,25 @@
 {
   "extends": "@repo/typescript-config/nestjs.json",
   "compilerOptions": {
+    "types": [
+      "jest"
+    ],
     "baseUrl": "./",
     "outDir": "./dist",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "paths": {
+      "@app/modules": [
+        "libs/modules/src"
+      ],
+      "@app/modules/*": [
+        "libs/modules/src/*"
+      ],
+      "api/contracts": [
+        "libs/contracts/src"
+      ],
+      "api/contracts/*": [
+        "libs/contracts/src/*"
+      ]
+    }
   }
 }
