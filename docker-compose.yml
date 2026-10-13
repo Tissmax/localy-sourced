@@ -1,4 +1,6 @@
 services:
+#--------FRONT
+#Conteneur NextJS pour le front
   web:
     container_name: web
     build:
@@ -15,15 +17,42 @@ services:
         - path: .
           target: package.json
           action: rebuild
-          
-  api:
-    container_name: api
+
+  #--------BACK
+  nats:
+    container_name: nats
+    image: nats:2.9.22-alpine
+    restart: always
+    ports:
+      - 4222:4222
+      - 8222:8222
+  
+  redis:
+    container_name: redis
+    image: redis:7.2.0-alpine
+    restart: always
+    ports:
+      - 6379:6379
+
+#Image utilisée pour build toutes les applications NestJS du monorepo
+  base:
+    image: monorepo-base
     build:
       context: .
       dockerfile: apps/Dockerfile.nest
-      args:
-        SERVICE_URI: api
-        SERVICE_NAME: api
+    entrypoint: ["true"]   # ce service ne sert qu'à être buildé
+    restart: "no"
+
+#Gateway          
+  api:
+    container_name: api
+    depends_on:
+      - nats
+    build:
+      context: .
+      dockerfile: apps/api/apps/api/api.Dockerfile
+      additional_contexts:
+        base: "service:base"
     restart: always
     ports:
       - 3001:3001
@@ -32,6 +61,82 @@ services:
         - path: .
           target: /src
           action: sync
-        - path: .
+        - path: ../
           target: package.json
           action: rebuild
+
+#Microservices
+  products:
+    container_name: products
+    depends_on:
+      - nats
+    build:
+      context: .
+      dockerfile: apps/api/apps/products/products.Dockerfile
+      additional_contexts:
+        base: "service:base"
+    restart: always
+    develop:
+      watch:
+        - path: .
+          target: /src
+          action: sync
+        - path: ../
+          target: package.json
+          action: rebuild
+  sales:
+    container_name: sales
+    depends_on:
+      - nats
+      - redis
+    build:
+      context: .
+      dockerfile: apps/api/apps/sales/sales.Dockerfile
+      additional_contexts:
+        base: "service:base"
+    restart: always
+    develop:
+      watch:
+        - path: .
+          target: /src
+          action: sync
+        - path: ../
+          target: package.json
+          action: rebuild
+  
+  users:
+    container_name: users
+    depends_on:
+      - nats
+    build:
+      context: .
+      dockerfile: apps/api/apps/users/users.Dockerfile
+      additional_contexts:
+        base: "service:base"
+    restart: always
+    develop:
+      watch:
+        - path: .
+          target: /src
+          action: sync
+        - path: ../
+          target: package.json
+          action: rebuild
+
+  postgres:
+    container_name: postgres
+    image: postgres:15.4-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

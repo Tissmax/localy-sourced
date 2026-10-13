@@ -1,7 +1,7 @@
 ARG NODE_VERSION=24.13.1
 FROM node:${NODE_VERSION}-slim AS base
 
-RUN corepack enable && corepack prepare pnpm@8.15.5 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 # This Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
 # Make sure you update both files!

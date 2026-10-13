@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      // registering NATS
+    ConfigModule.forRoot(),
+    ClientsModule.register([ // registering NATS 
       {
         name: 'NATS_SERVICE',
         transport: Transport.NATS,
         options: {
-          servers: ['nats://nats:4222'], // specifying the NATS server URL
+          servers: [process.env.NATS_URL || 'nats://nats:4222'], // specifying the NATS server URL
         },
       },
     ]),
