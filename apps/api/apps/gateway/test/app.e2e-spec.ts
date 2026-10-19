@@ -1,15 +1,14 @@
-import { beforeEach, describe, it } from '@jest/globals';
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import request from 'supertest';
-import { AppModule } from './../src/app/app.module';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { GatewayModule } from './../src/gateway.module';
 
-describe('AppController (e2e)', () => {
+describe('GatewayController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [GatewayModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

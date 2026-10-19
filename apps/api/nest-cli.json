@@ -10,22 +10,22 @@
   "monorepo": true,
   "root": "apps/api",
   "projects": {
-    "api": {
-      "type": "application",
-      "root": "apps/api",
-      "entryFile": "main",
-      "sourceRoot": "apps/api/src",
+    "entities": {
+      "type": "library",
+      "root": "libs/entities",
+      "entryFile": "index",
+      "sourceRoot": "libs/entities/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/api/tsconfig.app.json"
+        "tsConfigPath": "libs/entities/tsconfig.lib.json"
       }
     },
-    "contracts": {
-      "type": "library",
-      "root": "libs/contracts",
-      "entryFile": "index",
-      "sourceRoot": "libs/contracts/src",
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
       }
     },
     "modules": {
