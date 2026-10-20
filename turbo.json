@@ -18,6 +18,15 @@
       "cache": false,
       "persistent": true
     },
-    "test:e2e": {}
+    "test:e2e": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "passThroughEnv": ["E2E_*", "NEXT_PUBLIC_*"]
+    },
+    "web#test:e2e": {
+      "cache": false,
+      "dependsOn": ["^build", "build", "api#test:e2e"],
+      "passThroughEnv": ["E2E_*", "NEXT_PUBLIC_*"]
+    }                            
   }
 }

@@ -1,6 +1,10 @@
 {
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
+    "outDir": "./dist",
+    "types": [
+      "node"
+    ],
     "plugins": [
       {
         "name": "next"

@@ -1,0 +1,109 @@
+# docker-compose.e2e.yml
+x-nest-service: &nest-service
+  image: e2e-api
+  pull_policy: never
+  restart: "no"
+  working_dir: /app
+  environment: &nest-env
+    NODE_ENV: test
+    NATS_URL: nats://nats-test:4222
+    REDIS_URL: redis://redis-test:6379
+    GATEWAY_PORT: ${GATEWAY_PORT:-3002}
+
+services:
+  nats-test:
+    image: nats:2.9.22-alpine
+    command: ["-m", "8222"]
+    ports: ["4223:4222"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz || exit 1"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  redis-test:
+    image: redis:7.2.0-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  db-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: postgres
+    ports: ["5433:5432"]
+    tmpfs: [/var/lib/postgresql/data]
+    volumes:
+      - type: bind
+        source: ./init-databases.sql
+        target: /docker-entrypoint-initdb.d/01-databases.sql
+        read_only: true
+        bind:
+          create_host_path: false
+    command: ["postgres", "-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  products:
+    <<: *nest-service
+    command: ["node", "apps/api/dist/apps/products/main.js"]
+    environment:
+      <<: *nest-env
+      DATABASE_URL: postgresql://test:test@db-test:5432/products_test
+    depends_on:
+      nats-test: { condition: service_healthy }
+      db-test: { condition: service_healthy }
+
+  users:
+    <<: *nest-service
+    command: ["node", "apps/api/dist/apps/users/main.js"]
+    environment:
+      <<: *nest-env
+      DATABASE_URL: postgresql://test:test@db-test:5432/users_test
+    depends_on:
+      nats-test: { condition: service_healthy }
+      db-test: { condition: service_healthy }
+
+  sales:
+    <<: *nest-service
+    command: ["node", "apps/api/dist/apps/sales/main.js"]
+    environment:
+      <<: *nest-env
+      DATABASE_URL: postgresql://test:test@db-test:5432/sales_test
+    depends_on:
+      nats-test: { condition: service_healthy }
+      redis-test: { condition: service_healthy }
+      db-test: { condition: service_healthy }
+
+  gateway:
+    <<: *nest-service
+    # seul service avec une section build : il produit l'image partagée
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile.e2e
+    command: ["node", "apps/api/dist/apps/gateway/main.js"]
+    ports:
+      - "${GATEWAY_PORT:-3002}:${GATEWAY_PORT:-3002}"
+    depends_on:
+      nats-test: { condition: service_healthy }
+      products: { condition: service_started }
+      users: { condition: service_started }
+      sales: { condition: service_started }
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:${GATEWAY_PORT:-3002}/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 3s
