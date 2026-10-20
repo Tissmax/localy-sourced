@@ -15,7 +15,8 @@
     "e2e:down": "docker compose --progress quiet -p e2e -f docker-compose.e2e.yml --env-file ../../.env.test down -v",
     "e2e:logs": "docker compose -p e2e -f docker-compose.e2e.yml --env-file ../../.env.test logs --tail=100",
     "e2e:run": "vitest run --config ./vitest.e2e.config.ts",
-    "test:e2e": "pnpm -s e2e:up || { pnpm -s e2e:logs; pnpm -s e2e:down; exit 1; }; pnpm -s e2e:run; code=$?; pnpm -s e2e:down; exit $code",
+    "test:e2e": "vitest run --config ./vitest.e2e.config.ts",
+    "test:e2e:standalone": "pnpm -s e2e:up || { pnpm -s e2e:logs; pnpm -s e2e:down; exit 1; }; pnpm -s test:e2e; code=$?; pnpm -s e2e:down; exit $code",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
   },
   "dependencies": {
