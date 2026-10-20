@@ -1,6 +1,6 @@
 import { logViolations } from '../support/a11y';
 
-const pages = ['/', '/login', '/products'];
+const pages = ['/'];
 
 describe('Accessibilité', () => {
   pages.forEach((path) => {

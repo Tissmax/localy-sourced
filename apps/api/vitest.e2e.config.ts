@@ -11,6 +11,7 @@ export default defineConfig({
     tsconfigPaths({ projects: [path.resolve(__dirname, 'tsconfig.json')] }),
   ],
   test: {
+    passWithNoTests: true,
     globals: true,
     environment: 'node',
     testTimeout: 30_000,

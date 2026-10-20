@@ -11,8 +11,8 @@
     "check-types": "tsc --noEmit",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "start:e2e": "NEXT_TELEMETRY_DISABLED=1 PORT=${NEXT_PUBLIC_PORT} HOSTNAME=0.0.0.0 node .next/standalone/apps/web/server.js > .next-e2e.log 2>&1",
-    "test:a11y": "start-server-and-test start:e2e http://localhost:${NEXT_PUBLIC_PORT} 'cypress run --quiet'",
+    "start:e2e": "NEXT_TELEMETRY_DISABLED=1 PORT=3003 HOSTNAME=0.0.0.0 node .next/standalone/apps/web/server.js > .next-e2e.log 2>&1",
+    "test:a11y": "start-server-and-test start:e2e http://localhost:${NEXT_PUBLIC_PORT} 'cypress run'",
     "test:e2e": "pnpm -s test:a11y"
   },
   "dependencies": {
