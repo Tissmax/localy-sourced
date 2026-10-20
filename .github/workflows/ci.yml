@@ -51,9 +51,6 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Créer .env.test
-        run: cp .env.test.example .env.test   # ou le bloc "cat > .env.test" vu plus haut
-
       - name: Test(e2e)
         run: pnpm test:e2e
 
