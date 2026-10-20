@@ -1,7 +1,0 @@
-{
-  "extends": ["//"],
-  "globalDependencies": ["../../package.json"],
-  "futureFlags": {
-    "pruneIncludesGlobalFiles": true
-  }
-}

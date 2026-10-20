@@ -20,7 +20,7 @@ cleanup() {
   code=$?
   save_logs
   pnpm --filter api -s e2e:down
-  [ $code -ne 0 ] && echo "Logs Docker : $LOG_DIR/" >&2
+  [[ $code -ne 0 ]] && echo "Logs Docker : $LOG_DIR/" >&2
   exit $code
 }
 trap cleanup EXIT INT TERM
