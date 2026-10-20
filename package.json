@@ -29,9 +29,7 @@
   },
   "pnpm": {
     "auditConfig": {
-      "ignoreGhsas": [
-        "GHSA-vfj7-8cjw-p6xm"
-      ]
+      "ignoreGhsas": ["GHSA-vfj7-8cjw-p6xm"]
     },
     "overrides": {
       "@babel/core@<7.29.6": "^7.29.6",
@@ -57,8 +55,5 @@
       "source-map-js@>=1.0.0 <1.2.2": "^1.2.2",
       "uuid@<11.1.1": "^11.1.1"
     }
-  },
-  "dependencies": {
-    "run-script-webpack-plugin": "^0.2.3"
   }
 }
