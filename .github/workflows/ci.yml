@@ -24,8 +24,6 @@ jobs:
         with:
           version: 9.15.9
       
-      - run: pnpm --filter web exec cypress verify
-      
       - name: Setup Node.js environment
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
@@ -37,9 +35,8 @@ jobs:
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm exec napi-postinstall unrs-resolver 1.11.1 check
           pnpm rebuild @parcel/watcher
-      
-      - name: Lint
-        run: pnpm lint
+
+      - run: pnpm --filter web exec cypress verify
 
       - name: Audit dependencies
         run: pnpm audit --audit-level=high
@@ -52,6 +49,9 @@ jobs:
 
       - name: Test(e2e)
         run: pnpm test:e2e
+
+      - name: Lint
+        run: pnpm lint
 
       - name: Format code
         run: pnpm format
