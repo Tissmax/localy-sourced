@@ -54,11 +54,7 @@ services:
 
   products:
     <<: *nest-service
-<<<<<<< HEAD
     command: ["node", "apps/api/dist/apps/products/main.cjs"]
-=======
-    command: ["node", "apps/api/dist/apps/products/main.js"]
->>>>>>> b0c9ee4 (Configuration de l'environnement de test (#12))
     environment:
       <<: *nest-env
       DATABASE_URL: postgresql://test:test@db-test:5432/products_test
@@ -68,11 +64,7 @@ services:
 
   users:
     <<: *nest-service
-<<<<<<< HEAD
     command: ["node", "apps/api/dist/apps/users/main.cjs"]
-=======
-    command: ["node", "apps/api/dist/apps/users/main.js"]
->>>>>>> b0c9ee4 (Configuration de l'environnement de test (#12))
     environment:
       <<: *nest-env
       DATABASE_URL: postgresql://test:test@db-test:5432/users_test
@@ -82,11 +74,7 @@ services:
 
   sales:
     <<: *nest-service
-<<<<<<< HEAD
     command: ["node", "apps/api/dist/apps/sales/main.cjs"]
-=======
-    command: ["node", "apps/api/dist/apps/sales/main.js"]
->>>>>>> b0c9ee4 (Configuration de l'environnement de test (#12))
     environment:
       <<: *nest-env
       DATABASE_URL: postgresql://test:test@db-test:5432/sales_test
@@ -101,29 +89,11 @@ services:
     build:
       context: ../..
       dockerfile: apps/api/Dockerfile.e2e
-<<<<<<< HEAD
     command: ["node", "apps/api/dist/apps/gateway/main.cjs"]
-=======
-    command: ["node", "apps/api/dist/apps/gateway/main.js"]
->>>>>>> b0c9ee4 (Configuration de l'environnement de test (#12))
     ports:
       - "${GATEWAY_PORT:-3002}:${GATEWAY_PORT:-3002}"
     depends_on:
       nats-test: { condition: service_healthy }
       products: { condition: service_started }
       users: { condition: service_started }
-<<<<<<< HEAD
       sales: { condition: service_started }
-=======
-      sales: { condition: service_started }
-    healthcheck:
-      test:
-        - CMD
-        - node
-        - -e
-        - "fetch('http://127.0.0.1:${GATEWAY_PORT:-3002}/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-      interval: 2s
-      timeout: 3s
-      retries: 15
-      start_period: 3s
->>>>>>> b0c9ee4 (Configuration de l'environnement de test (#12))
