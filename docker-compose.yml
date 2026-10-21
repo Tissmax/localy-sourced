@@ -1,3 +1,15 @@
+x-nest: &nest
+  build:
+    context: .
+    target: dev
+  environment:
+    NODE_ENV: development
+  volumes:
+    - .:/app
+    # Empêche le node_modules de l'hôte d'écraser celui du conteneur
+    - /app/node_modules
+    - /app/apps/api/node_modules
+
 services:
 #--------FRONT
 #Conteneur NextJS pour le front
@@ -43,86 +55,22 @@ services:
     entrypoint: ["true"]   # ce service ne sert qu'à être buildé
     restart: "no"
 
-#Gateway          
-  api:
-    container_name: api
-    depends_on:
-      - nats
-    build:
-      context: .
-      dockerfile: apps/api/apps/api/api.Dockerfile
-      additional_contexts:
-        base: "service:base"
-    restart: always
-    ports:
-      - 3001:3001
-    develop:
-      watch:
-        - path: .
-          target: /src
-          action: sync
-        - path: ../
-          target: package.json
-          action: rebuild
+  gateway:
+    <<: *nest
+    command: pnpm exec rspack build --watch -c apps/api/apps/gateway/rspack.config.mjs
+    ports: ["3001:3001"]
 
-#Microservices
   products:
-    container_name: products
-    depends_on:
-      - nats
-    build:
-      context: .
-      dockerfile: apps/api/apps/products/products.Dockerfile
-      additional_contexts:
-        base: "service:base"
-    restart: always
-    develop:
-      watch:
-        - path: .
-          target: /src
-          action: sync
-        - path: ../
-          target: package.json
-          action: rebuild
+    <<: *nest
+    command: pnpm exec rspack build --watch -c apps/api/apps/products/rspack.config.mjs
   sales:
-    container_name: sales
-    depends_on:
-      - nats
-      - redis
-    build:
-      context: .
-      dockerfile: apps/api/apps/sales/sales.Dockerfile
-      additional_contexts:
-        base: "service:base"
-    restart: always
-    develop:
-      watch:
-        - path: .
-          target: /src
-          action: sync
-        - path: ../
-          target: package.json
-          action: rebuild
-  
-  users:
-    container_name: users
-    depends_on:
-      - nats
-    build:
-      context: .
-      dockerfile: apps/api/apps/users/users.Dockerfile
-      additional_contexts:
-        base: "service:base"
-    restart: always
-    develop:
-      watch:
-        - path: .
-          target: /src
-          action: sync
-        - path: ../
-          target: package.json
-          action: rebuild
+    <<: *nest
+    command: pnpm exec rspack build --watch -c apps/api/apps/sales/rspack.config.mjs
 
+  users:
+    <<: *nest
+    command: pnpm exec rspack build --watch -c apps/api/apps/users/rspack.config.mjs
+  
   postgres:
     container_name: postgres
     image: postgres:15.4-alpine

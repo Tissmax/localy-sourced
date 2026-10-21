@@ -3,11 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nest start --watch",
-    "build": "nest build",
-    "start": "nest start",
+    "dev": "rspack dev -c rspack.config.mjs --env app=gateway",
+    "build": "rspack build -c rspack.config.mjs",
+    "start:prod": "node dist/apps/gateway/main.cjs",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/apps/api/main",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -60,7 +59,6 @@
     "typescript": "5.8.2",
     "unplugin-swc": "^2.0.0",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^5.0.5",
-    "webpack": "^5.105.4"
+    "vitest": "^5.0.5"
   }
 }

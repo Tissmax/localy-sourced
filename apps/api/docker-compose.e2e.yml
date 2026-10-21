@@ -54,7 +54,7 @@ services:
 
   products:
     <<: *nest-service
-    command: ["node", "apps/api/dist/apps/products/main.js"]
+    command: ["node", "apps/api/dist/apps/products/main.cjs"]
     environment:
       <<: *nest-env
       DATABASE_URL: postgresql://test:test@db-test:5432/products_test
@@ -64,7 +64,7 @@ services:
 
   users:
     <<: *nest-service
-    command: ["node", "apps/api/dist/apps/users/main.js"]
+    command: ["node", "apps/api/dist/apps/users/main.cjs"]
     environment:
       <<: *nest-env
       DATABASE_URL: postgresql://test:test@db-test:5432/users_test
@@ -74,7 +74,7 @@ services:
 
   sales:
     <<: *nest-service
-    command: ["node", "apps/api/dist/apps/sales/main.js"]
+    command: ["node", "apps/api/dist/apps/sales/main.cjs"]
     environment:
       <<: *nest-env
       DATABASE_URL: postgresql://test:test@db-test:5432/sales_test
@@ -89,7 +89,7 @@ services:
     build:
       context: ../..
       dockerfile: apps/api/Dockerfile.e2e
-    command: ["node", "apps/api/dist/apps/gateway/main.js"]
+    command: ["node", "apps/api/dist/apps/gateway/main.cjs"]
     ports:
       - "${GATEWAY_PORT:-3002}:${GATEWAY_PORT:-3002}"
     depends_on:
@@ -97,13 +97,3 @@ services:
       products: { condition: service_started }
       users: { condition: service_started }
       sales: { condition: service_started }
-    healthcheck:
-      test:
-        - CMD
-        - node
-        - -e
-        - "fetch('http://127.0.0.1:${GATEWAY_PORT:-3002}/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-      interval: 2s
-      timeout: 3s
-      retries: 15
-      start_period: 3s

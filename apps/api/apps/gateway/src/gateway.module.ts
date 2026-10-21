@@ -1,8 +1,9 @@
+import { NatsClientModule } from '@app/modules/nats-client/nats-client.module';
 import { Module } from '@nestjs/common';
 import { HealthController } from './health/health.controller';
 
 @Module({
-  imports: [],
+  imports: [NatsClientModule],
   controllers: [HealthController],
   providers: [],
 })
