@@ -1,15 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "root": "apps/gateway",
-  "sourceRoot": "apps/gateway/src",
+  "sourceRoot": "apps/api/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": false,
-    "builder": "rspack",
-    "tsConfigPath": "apps/gateway/tsconfig.app.json"
+    "tsConfigPath": "apps/api/tsconfig.app.json"
   },
   "monorepo": true,
+  "root": "apps/api",
   "projects": {
     "entities": {
       "type": "library",
