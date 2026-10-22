@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-set -a; source .env.test; set +a
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+ENV_FILE="$ROOT_DIR/.env.test"
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "Missing $ENV_FILE. Create the test environment file before running E2E tests." >&2
+  exit 1
+fi
+
+set -a; source "$ENV_FILE"; set +a
 
 LOG_DIR="logs/e2e"
-DC="docker compose -p e2e -f apps/api/docker-compose.e2e.yml --env-file .env.test"
+DC="docker compose -p e2e -f apps/api/docker-compose.e2e.yml --env-file $ENV_FILE"
 
 save_logs() {
   mkdir -p "$LOG_DIR"

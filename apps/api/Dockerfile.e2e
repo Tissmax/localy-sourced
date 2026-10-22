@@ -17,8 +17,6 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile --node-linker=hoisted
 # 2. Sources + compilation unique des 4 apps
 COPY --from=prune /app/out/full/ .
-RUN for app in gateway products users sales; do \
-      pnpm --filter api exec nest build $app || exit 1; \
-    done
+RUN pnpm build --filter=api
 ENV NODE_ENV=test
 USER node

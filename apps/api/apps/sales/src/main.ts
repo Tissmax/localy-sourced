@@ -9,6 +9,7 @@ async function bootstrap() {
       servers: [process.env.NATS_URL || 'nats://nats:4222'],
     },
   });
+  console.log('Sales service is listening... to NATS on', process.env.NATS_URL || 'nats://nats:4222');
   await app.listen();
 }
 void bootstrap();
