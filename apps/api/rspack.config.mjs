@@ -51,7 +51,8 @@ function createNestConfig(name) {
             options: {
               detectSyntax: 'auto',
               jsc: {
-                parser: { decorators: true },
+                target: 'es2022',
+                parser: { syntax: 'typescript', decorators: true },
                 transform: { legacyDecorator: true, decoratorMetadata: true },
               },
             },

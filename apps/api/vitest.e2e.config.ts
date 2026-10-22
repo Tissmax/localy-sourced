@@ -22,7 +22,7 @@ export default defineConfig({
       test: {
         name: app,
         root: `./apps/${app}`,
-        include: ['test/**/*.e2e-spec.ts'],
+        include: ['test/**/*.e2e.spec.ts'],
       },
     })),
   },
