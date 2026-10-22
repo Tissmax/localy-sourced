@@ -20,6 +20,16 @@ export const nestConfig = mergeConfig(
       fileParallelism: false, // équivalent de maxWorkers: 1
       coverage: {
         include: ['**/*.{ts,js}'],
+        exclude: [
+          '**/*.d.ts',
+          '**/*.spec.ts',
+          '**/*.e2e.spec.ts',
+          '**/node_modules/**',
+          '**/main.ts',
+          '**/index.ts',
+          '**/*config.ts',
+          '**/dist/**',
+        ],
         reportsDirectory: path.resolve(process.cwd(), 'coverage'),
       },
     },
