@@ -7,7 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "turbo run build --filter=!web",
+    "build --full": "turbo run build",
     "test": "turbo run test",
     "test:e2e": "bash scripts/e2e.sh",
     "test:a11y": "turbo run test:a11y",
