@@ -45,6 +45,14 @@ jobs:
       - name: Audit dependencies
         run: pnpm audit --audit-level=high
 
+      - name: Inspect schema package
+        run: |
+          pwd
+          ls -la packages/schema
+          ls -la packages/schema/dist
+          cat packages/schema/package.json
+          ls -la node_modules/@repo/schema || true
+
       - name: Build
         run: pnpm build
 
