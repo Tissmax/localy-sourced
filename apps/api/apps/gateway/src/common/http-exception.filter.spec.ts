@@ -5,7 +5,7 @@ import { ZodSerializationException } from 'nestjs-zod';
 import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z, ZodError } from 'zod';
-import { HttpExceptionFilter } from '../../../src/common/http-exception.filter';
+import { HttpExceptionFilter } from './http-exception.filter';
 
 /** Produit une vraie ZodError en faisant échouer un schéma. */
 function createZodError(): ZodError {

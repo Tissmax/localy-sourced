@@ -8,7 +8,7 @@ import {
 import { TimeoutError } from 'rxjs';
 import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { RpcToHttpFilter } from '../../../src/common/rpc-to-http.filter';
+import { RpcToHttpFilter } from './rpc-to-http.filter';
 /** Fabrique un faux ArgumentsHost qui expose une réponse Express minimale. */
 function createHost() {
   const json = vi.fn();
