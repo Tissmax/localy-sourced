@@ -4,6 +4,7 @@ https://docs.nestjs.com/modules
 
 import { NatsClientModule } from '@app/modules/nats-client/nats-client.module';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { AuthModule } from './auth/auth.module';
@@ -15,6 +16,7 @@ import { UsersController } from './users/users.controller';
     imports: [
         NatsClientModule,
         AuthModule,
+        ConfigModule.forRoot({ isGlobal: true }),
     ],
     controllers: [
         HealthController, 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HealthController } from '../../src/health/health.controller';
+import { HealthController } from './health.controller';
 
 describe('HealthController', () => {
   it('demande la santé de products à NATS', async () => {

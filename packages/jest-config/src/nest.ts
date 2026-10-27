@@ -9,10 +9,11 @@ export const nestConfig = mergeConfig(
   defineConfig({
     // SWC génère les métadonnées de décorateurs dont Nest a besoin (remplace ts-jest)
     plugins: [
-      swc.vite(),
+      swc.vite({ module: { type: 'es6' } }),
       tsconfigPaths({ projects: [path.resolve(process.cwd(), 'tsconfig.json')] }),
     ],
     test: {
+      globals: true,
       root: 'src',
       include: ['**/*.spec.ts'],
       environment: 'node',
@@ -37,6 +38,8 @@ export const nestConfig = mergeConfig(
           '**/interfaces/**/*.{ts,js}',
           '**/types/**/*.{ts,js}',
           '**/*.strategy.{ts,js}',
+          '**/*.pipe.{ts,js}',
+          '**/*.repository.{ts,js}',
         ],
         reportsDirectory: path.resolve(process.cwd(), 'coverage'),
       },

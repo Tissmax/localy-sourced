@@ -1,21 +1,24 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm"
 
-@Entity()
+@Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id!: number
+    @PrimaryGeneratedColumn('uuid')
+    id!: string
 
-    @Column()
+    @Column({unique: true})
     email!: string
 
-    @Column()
-    password!: string
+    @Column({select: false})
+    passwordHash!: string
 
     @Column()
     firstName!: string
 
     @Column()
     lastName!: string
+
+    @Column({ type: 'text', array: true, default: () => "ARRAY['user']" })
+    roles!: string[];
 
     @Column()
     isActive!: boolean

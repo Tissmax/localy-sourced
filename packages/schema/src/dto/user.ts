@@ -5,6 +5,7 @@ const passwordCreationSchema = z.string()
         .refine((val) => /[A-Z]/.test(val), { message: 'Le mot de passe doit contenir au moins une majuscule' })
         .refine((val) => /[a-z]/.test(val), { message: 'Le mot de passe doit contenir au moins une minuscule' })
         .refine((val) => /[0-9]/.test(val), { message: 'Le mot de passe doit contenir au moins un chiffre' })
+        .refine((val) => /[^A-Za-z0-9]/.test(val), { message: 'Le mot de passe doit contenir au moins un caractère spécial' })
 
 export const UserConnectionSchema = z.object({
     email: z.email(),
@@ -26,9 +27,10 @@ export type UserAccountCreationType = z.infer<typeof UserAccountCreationSchema>
 export const UserResponseSchema = UserAccountCreationSchema
     .omit({ password: true })
     .extend({
-    id: z.number(),
+    id: z.uuid(),
     isActive: z.boolean(),
-    createdAt: z.date()
+    createdAt: z.date(),
+    roles: z.array(z.string())
 })
 
 export type UserResponseType = z.infer<typeof UserResponseSchema>
