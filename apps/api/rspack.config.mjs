@@ -34,7 +34,7 @@ function createNestConfig(name) {
       main: isDev ? ['@rspack/core/hot/poll?100', './src/main.ts'] : './src/main.ts',
     },
     output: {
-      path: path.join(rootDir, 'dist', 'apps', name),
+      path: path.join(rootDir, isDev ? 'dist-dev' : 'dist', 'apps', name),
       clean: true,
       filename: '[name].cjs',
     },
