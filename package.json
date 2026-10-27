@@ -9,7 +9,7 @@
     "dev": "docker compose down && docker compose build gateway && docker compose up -d",
     "dev:build": "docker compose down && docker compose up --build",
     "build": "turbo run build --filter=!web",
-    "build --full": "turbo run build",
+    "build:full": "turbo run build",
     "test": "turbo run test",
     "test:e2e": "bash scripts/e2e.sh",
     "test:a11y": "turbo run test:a11y",
