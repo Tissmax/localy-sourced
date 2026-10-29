@@ -41,6 +41,13 @@ function createNestConfig(name) {
     resolve: {
       extensions: ['...', '.ts'],
       tsConfig: path.join(appDir, 'tsconfig.app.json'),
+      extensionAlias: {
+        '.js': ['.ts', '.js'],
+        '.mjs': ['.mts', '.mjs'],
+      },
+      alias: {
+        '@repo/schema$': path.resolve(rootDir, '../../packages/schema/src/index.ts'),
+      },
     },
     module: {
       rules: [

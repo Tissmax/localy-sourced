@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "rspack dev -c rspack.config.mjs --env app=gateway",
     "build": "NODE_ENV=production rspack build -c rspack.config.mjs",
+    "build:dev": "rspack build -c rspack.config.mjs",
     "start:prod": "node dist/apps/gateway/main.cjs",
     "start:debug": "nest start --debug --watch",
     "test": "vitest --passWithNoTests",
