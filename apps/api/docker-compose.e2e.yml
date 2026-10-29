@@ -64,7 +64,7 @@ services:
     command: ["node", "apps/api/dist/apps/products/main.cjs"]
     environment:
       <<: *nest-env
-      <<: *db_env
+      <<: *db-env
       DATABASE_URL: postgresql://test:test@db-test:5432/products_test
     depends_on:
       nats-test: { condition: service_healthy }
@@ -75,7 +75,7 @@ services:
     command: ["node", "apps/api/dist/apps/users/main.cjs"]
     environment:
       <<: *nest-env
-      <<: *db_env
+      <<: *db-env
       DATABASE_URL: postgresql://test:test@db-test:5432/users_test
     depends_on:
       nats-test: { condition: service_healthy }
@@ -86,7 +86,7 @@ services:
     command: ["node", "apps/api/dist/apps/sales/main.cjs"]
     environment:
       <<: *nest-env
-      <<: *db_env
+      <<: *db-env
       DATABASE_URL: postgresql://test:test@db-test:5432/sales_test
     depends_on:
       nats-test: { condition: service_healthy }
