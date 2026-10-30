@@ -34,13 +34,20 @@ function createNestConfig(name) {
       main: isDev ? ['@rspack/core/hot/poll?100', './src/main.ts'] : './src/main.ts',
     },
     output: {
-      path: path.join(rootDir, 'dist', 'apps', name),
+      path: path.join(rootDir, isDev ? 'dist-dev' : 'dist', 'apps', name),
       clean: true,
       filename: '[name].cjs',
     },
     resolve: {
       extensions: ['...', '.ts'],
       tsConfig: path.join(appDir, 'tsconfig.app.json'),
+      extensionAlias: {
+        '.js': ['.ts', '.js'],
+        '.mjs': ['.mts', '.mjs'],
+      },
+      alias: {
+        '@repo/schema$': path.resolve(rootDir, '../../packages/schema/src/index.ts'),
+      },
     },
     module: {
       rules: [

@@ -9,6 +9,7 @@ export const baseConfig = defineConfig({
       enabled: true,
       provider: 'v8',
       reportsDirectory: path.resolve(process.cwd(), 'coverage'),
+      exclude: ['**/*.d.ts', '**/*.spec.ts', '**/*.e2e.spec.ts', '**/node_modules/**', '**/main.ts', '**/index.ts', '**/dist/**']
     },
   },
 });
