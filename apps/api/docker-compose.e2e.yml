@@ -96,9 +96,9 @@ services:
   gateway:
     <<: *nest-service
     # seul service avec une section build : il produit l'image partagée
-    env_file: [../../.env]
     environment:
       <<: *nest-env
+      JWT_SECRET: vcyKACnXo60eKr861PxV9DDiEN8qj3qse2EjDtl8WX5
     build:
       context: ../..
       dockerfile: apps/api/Dockerfile.e2e
