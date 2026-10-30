@@ -96,6 +96,9 @@ services:
   gateway:
     <<: *nest-service
     # seul service avec une section build : il produit l'image partagée
+    env_file: [../../.env]
+    environment:
+      <<: *nest-env
     build:
       context: ../..
       dockerfile: apps/api/Dockerfile.e2e

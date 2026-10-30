@@ -15,7 +15,7 @@ WORKDIR /app
 FROM base AS prepare
 COPY . .
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm dlx turbo prune web --docker
+    pnpm dlx turbo:2.11.7 prune web --docker
 
 # --- Dépendances (cache stable tant que les manifests ne changent pas)
 FROM base AS builder
