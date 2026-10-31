@@ -40,6 +40,7 @@ export const nestConfig = mergeConfig(
           '**/*.strategy.{ts,js}',
           '**/*.pipe.{ts,js}',
           '**/*.repository.{ts,js}',
+          '**/dist-dev/**'
         ],
         reportsDirectory: path.resolve(process.cwd(), 'coverage'),
       },

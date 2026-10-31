@@ -8,7 +8,7 @@ export default mergeConfig(
     test: {
       root: '.',
       include: ['apps/**/src/**/*.spec.ts', 'libs/**/*.spec.ts'],
-      exclude: ['**/node_modules/**', '**/*.e2e.spec.ts'],
+      exclude: ['**/node_modules/**', '**/*.e2e.spec.ts', '**/dist-dev/**'],
     },
     resolve: {
       alias: [
