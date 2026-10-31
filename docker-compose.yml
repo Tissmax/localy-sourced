@@ -1,90 +1,129 @@
+x-logging: &log
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
 x-nest: &nest
-  build:
-    context: .
-    target: dev
-  environment:
-    NODE_ENV: development
+  image: monorepo-base
+  pull_policy: never          # l'image est construite par le service gateway
+  init: true                  # nettoie les processus enfants, propage les signaux
+  restart: on-failure:5
+  mem_limit: 768m
+  memswap_limit: 768m         # pas de swap dans le conteneur : OOM propre, pas de VM qui rame
+  logging: *log
+  depends_on:
+    nats:     { condition: service_healthy }
+    redis:    { condition: service_healthy }
+    postgres: { condition: service_healthy }
   volumes:
-    - .:/app
-    # Empêche le node_modules de l'hôte d'écraser celui du conteneur
-    - /app/node_modules
-    - /app/apps/api/node_modules
+    - ./apps:/app/apps
+    - ./packages:/app/packages
+    - ./package.json:/app/package.json:ro
+    - ./pnpm-workspace.yaml:/app/pnpm-workspace.yaml:ro
+    - nm_root:/app/node_modules
 
 services:
-#--------FRONT
-#Conteneur NextJS pour le front
+  # ---------- FRONT
   web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: apps/Dockerfile.next
-    restart: always
-    ports:
-      - 3000:3000
-    develop:
-      watch:
-        - path: .
-          target: /src
-          action: sync
-        - path: .
-          target: package.json
-          action: rebuild
-
-  #--------BACK
-  nats:
-    container_name: nats
-    image: nats:2.9.22-alpine
-    restart: always
-    ports:
-      - 4222:4222
-      - 8222:8222
-  
-  redis:
-    container_name: redis
-    image: redis:7.2.0-alpine
-    restart: always
-    ports:
-      - 6379:6379
-
-#Image utilisée pour build toutes les applications NestJS du monorepo
-  base:
     image: monorepo-base
+    pull_policy: never
+    init: true
+    restart: on-failure:5
+    mem_limit: 1536m
+    memswap_limit: 1536m
+    logging: *log
+    working_dir: /app/apps/web
+    command: ["pnpm", "exec", "next", "dev", "-H", "0.0.0.0", "-p", "3000"]
+    ports: ["3000:3000"]
+    environment:
+      NODE_ENV: development
+      NODE_OPTIONS: --max-old-space-size=1024
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes:
+      - .:/app
+      - nm_root:/app/node_modules
+      - next_cache:/app/apps/web/.next
+    
+
+  # ---------- BACK : une seule image (monorepo-base), construite via gateway
+  gateway:
+    <<: *nest
     build:
       context: .
       dockerfile: apps/Dockerfile.nest
-    entrypoint: ["true"]   # ce service ne sert qu'à être buildé
-    restart: "no"
-
-  gateway:
-    <<: *nest
-    command: pnpm exec rspack build --watch -c apps/api/apps/gateway/rspack.config.mjs
+      target: dev
+    env_file: [.env, apps/api/apps/gateway/.env]
+    environment: { APP: gateway }
     ports: ["3001:3001"]
 
   products:
     <<: *nest
-    command: pnpm exec rspack build --watch -c apps/api/apps/products/rspack.config.mjs
+    env_file: [.env, apps/api/apps/products/.env]
+    environment: { APP: products }
+
   sales:
     <<: *nest
-    command: pnpm exec rspack build --watch -c apps/api/apps/sales/rspack.config.mjs
+    env_file: [.env, apps/api/apps/sales/.env]
+    environment: { APP: sales }
 
   users:
     <<: *nest
-    command: pnpm exec rspack build --watch -c apps/api/apps/users/rspack.config.mjs
-  
+    env_file: [.env, apps/api/apps/users/.env]
+    environment: { APP: users }
+
+  # ---------- INFRA
+  nats:
+    image: nats:2.9.22-alpine
+    container_name: nats
+    restart: unless-stopped
+    mem_limit: 64m
+    logging: *log
+    ports: ["127.0.0.1:4222:4222", "127.0.0.1:8222:8222"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7.2.0-alpine
+    container_name: redis
+    restart: unless-stopped
+    mem_limit: 160m
+    logging: *log
+    command: ["redis-server", "--maxmemory", "100mb", "--maxmemory-policy", "allkeys-lru", "--save", ""]
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   postgres:
-    container_name: postgres
     image: postgres:15.4-alpine
-    restart: always
+    container_name: postgres
+    restart: unless-stopped
+    mem_limit: 512m
+    logging: *log
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=50"]
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    env_file:
-      - .env
-    ports:
-      - 5432:5432
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: app
+      USERS_DB_PASSWORD: ${USERS_DB_PASSWORD:-change-me}
+      SALES_DB_PASSWORD: ${SALES_DB_PASSWORD:-change-me}
+      PRODUCTS_DB_PASSWORD: ${PRODUCTS_DB_PASSWORD:-change-me}
+    env_file: [.env]
+    ports: ["127.0.0.1:5432:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   postgres_data:
+  nm_root:
+  next_cache:

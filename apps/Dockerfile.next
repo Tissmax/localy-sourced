@@ -1,50 +1,45 @@
+# syntax=docker/dockerfile:1.7
 ARG NODE_VERSION=24.13.1
-FROM node:${NODE_VERSION}-slim AS base
-
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
-
-# This Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
-# Make sure you update both files!
-
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-# Set working directory
+FROM node:${NODE_VERSION}-bookworm-slim AS base
+ENV PNPM_HOME=/pnpm \
+    PATH=/pnpm:$PATH \
+    npm_config_store_dir=/pnpm/store \
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
+    NEXT_TELEMETRY_DISABLED=1 \
+    CYPRESS_INSTALL_BINARY=0 \
+    CI=true
+RUN corepack enable
 WORKDIR /app
 
-# ---
+# --- Isole uniquement ce dont "web" a besoin
 FROM base AS prepare
-RUN yarn global add turbo
 COPY . .
-# Add lockfile and package.json's of isolated subworkspace
-RUN turbo prune web --docker
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm dlx turbo@2.11.7 prune web --docker
 
-# ---
+# --- Dépendances (cache stable tant que les manifests ne changent pas)
 FROM base AS builder
-# First install the dependencies (as they change less often)
 COPY --from=prepare /app/out/json/ .
-RUN pnpm install --frozen-lockfile --node-linker=hoisted
-# Build the project
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --node-linker=hoisted
 COPY --from=prepare /app/out/full/ .
+# Plafonne la mémoire du build : pic d'environ 2 Go
+ENV NODE_OPTIONS=--max-old-space-size=2048
+RUN pnpm turbo build --filter=web
 
-# Uncomment and use build args to enable remote caching
-# ARG TURBO_TEAM
-# ENV TURBO_TEAM=$TURBO_TEAM
-
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
-
-RUN pnpm turbo build
-
-# ---
-FROM node:${NODE_VERSION}-alpine AS runner
-# Don't run production as root for security reasons
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# --- Runtime
+FROM node:${NODE_VERSION}-bookworm-slim AS runner
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
+WORKDIR /app
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid nodejs nextjs
 USER nextjs
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
-
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"
 CMD ["node", "apps/web/server.js"]
